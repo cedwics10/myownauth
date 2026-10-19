@@ -4,6 +4,7 @@
 
 - `app/` : API Express + SQLite (`app/database.db`, créée automatiquement) sur `http://localhost:3000`.
 - `front/` : front Vue (Vite). Le proxy Vite redirige `/api/*` vers l'API.
+- `batcave-security/` : serveur du TP1 (Basic Auth). Les onglets des phases 3.x de la page TP1 le vérifient en direct via `/batcave-security/*`.
 
 ## Démarrer avec Docker (recommandé)
 
@@ -14,7 +15,8 @@ docker compose up -d
 Ouvrez `http://localhost:8088`. Tout est défini dans `docker-compose.yml`, avec les Dockerfiles et la config nginx inline :
 
 - `api` : Node 22 + Express, base SQLite dans le volume `batcave-data` (conservée entre les redémarrages) ;
-- `front` : build Vite servi par nginx, qui relaie `/api/*` vers l'API.
+- `batcave-security` : serveur du TP1, joignable directement sur `http://localhost:3100` (`$env:BATCAVE_SECURITY_PORT` pour changer). Sa base est dans le volume `batcave-security-data` (conservée entre les reconstructions) ;
+- `front` : build Vite servi par nginx, qui relaie `/api/*` vers l'API et `/batcave-security/*` vers le serveur du TP1 (en renommant `WWW-Authenticate` en `X-WWW-Authenticate`, pour que le navigateur n'ouvre pas sa fenêtre de connexion pendant les vérifications).
 
 Commandes utiles :
 

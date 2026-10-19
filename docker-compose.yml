@@ -29,6 +29,39 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # Serveur du TP1, vérifié en direct par les onglets des phases 3.x.
+  batcave-security:
+    build:
+      context: ./batcave-security
+      dockerfile_inline: |
+        # Image complète pour compiler bcrypt et better-sqlite3, image légère pour l'exécution.
+        FROM node:22 AS deps
+        WORKDIR /srv/batcave-security
+        COPY package.json package-lock.json ./
+        RUN npm ci --omit=dev
+
+        FROM node:22-slim
+        WORKDIR /srv/batcave-security
+        COPY --from=deps /srv/batcave-security/node_modules ./node_modules
+        COPY package.json server.js db.js ./
+        COPY public ./public
+        COPY private ./private
+        # db.js ouvre database.db à côté de server.js : on le redirige vers le volume, sans toucher au code du TP.
+        RUN mkdir /data && ln -s /data/database.db database.db
+        EXPOSE 3000
+        CMD ["node", "server.js"]
+    # Publié seulement pour ouvrir le vrai Bat-Ordinateur (3000 à 3002 sont souvent pris).
+    ports:
+      - "${BATCAVE_SECURITY_PORT:-3100}:3000"
+    volumes:
+      - batcave-security-data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/register.html').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   front:
     build:
       context: ./front
@@ -52,6 +85,8 @@ services:
     depends_on:
       api:
         condition: service_healthy
+      batcave-security:
+        condition: service_healthy
     restart: unless-stopped
 
 configs:
@@ -64,6 +99,16 @@ configs:
         location /api/ {
           proxy_pass http://api:3000;
           proxy_set_header Host $$host;
+        }
+
+        # Serveur du TP1, pour les vérifications des phases 3.x.
+        # WWW-Authenticate est renommé pour que le navigateur n'ouvre pas sa fenêtre de connexion.
+        location /batcave-security/ {
+          proxy_pass http://batcave-security:3000/;
+          proxy_set_header Host $$host;
+          proxy_hide_header WWW-Authenticate;
+          add_header X-WWW-Authenticate $$upstream_http_www_authenticate always;
+          add_header Cache-Control "no-store" always;
         }
 
         # Fichiers versionnés par Vite : cache long.
@@ -80,3 +125,4 @@ configs:
 
 volumes:
   batcave-data:
+  batcave-security-data:

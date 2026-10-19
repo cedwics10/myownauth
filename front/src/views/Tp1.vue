@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+import Phase3Verifier from '../components/Phase3Verifier.vue'
+
 type SourceFile = { path: string; note: string; code: string }
 type Step = { title: string; detail: string; files: SourceFile[] }
-type Phase = { title: string; instructions: string; steps: Step[] }
+type Phase = { title: string; instructions: string; steps: Step[]; verifier?: '3' | '3.1' | '3.2' }
 
 const steps: Step[] = [
   {
@@ -285,6 +287,27 @@ app.listen(PORT, () => console.log(\`Batcave sur http://localhost:\${PORT}\`));`
       },
     ],
   },
+  {
+    title: 'Phase 3 : Protection du Bat-Ordinateur',
+    instructions:
+      'Le Bat-Ordinateur contient des fichiers sensibles ! Il faut sécuriser le serveur : Implémentez une fonction middleware qui : vérifie la présence de l’en-tête Authorization ; décode le Base64 ; compare les identifiants saisis avec ceux stockés en base ; renvoie une réponse 401 avec l’en-tête WWW-Authenticate en cas d’erreur. Routes protégées : GET /bat-computer doit servir un fichier HTML private/bat-computer.html (hors du dossier public) ; GET /api/secrets doit renvoyer un tableau d’objets au format JSON où chaque objet représente un des gadgets de Batman (ex: { "name": "Batarang", "desc": "Arme de jet", "icon": "fa-shuriken" }).',
+    verifier: '3',
+    steps: [],
+  },
+  {
+    title: 'Phase 3.1 : Personnalisation de l’accès',
+    instructions:
+      'Le middleware ne sert pas qu’à bloquer, il sert aussi à identifier. Améliorez l’expérience dans la Batcave : Créez une nouvelle route GET /api/me qui utilise les informations stockées dans req.user (par votre middleware) pour renvoyer, en JSON, le nom de l’utilisateur authentifié et son id. Modifiez le fichier private/bat-computer.html. Au chargement de la page, utilisez fetch() pour appeler la route GET /api/me et affichez un message personnalisé : « Bienvenue, Justicier [Nom d’utilisateur] ». Créez une route POST /api/reports permettant d’enregistrer une note de mission. Le rapport doit être enregistré dans une nouvelle table SQLite reports et être lié à l’id de l’utilisateur qui l’envoie (clé étrangère).',
+    verifier: '3.1',
+    steps: [],
+  },
+  {
+    title: 'Phase 3.2 : L’arsenal dynamique',
+    instructions:
+      'Côté client (private/bat-computer.html) : Au chargement de la page, utilisez fetch() pour appeler votre route GET /api/secrets. N’oubliez pas d’injecter manuellement l’en-tête Authorization: Basic <base64> dans les options du fetch(). Rendu graphique (DOM) : Bouclez sur les données ainsi reçues pour générer dynamiquement des cartes Bootstrap, par exemple. L’arsenal doit s’afficher sous forme de grille (utilisez le standard CSS Flexbox ou Grid). Rappel de sécurité : le navigateur ne gère pas l’en-tête de manière automatique lors d’un appel fetch(). Si vous oubliez de configurer l’objet headers dans votre front-end, votre requête sera rejetée avec un code 401 Unauthorized.',
+    verifier: '3.2',
+    steps: [],
+  },
 ]
 
 const active = ref(0)
@@ -341,6 +364,7 @@ function onTabKeydown(event: KeyboardEvent) {
     :aria-labelledby="`tp1-tab-${index}`"
   >
     <p class="tab-detail">{{ phase.instructions }}</p>
+    <Phase3Verifier v-if="phase.verifier" :phase="phase.verifier" />
     <div v-for="(step, stepIndex) in phase.steps" :key="step.title" class="phase-step">
       <div class="section-heading">
         <h2>{{ stepIndex + 1 }}. {{ step.title }}</h2>
