@@ -52,6 +52,9 @@ button, input, textarea { font: inherit; }
 .menu-link.is-soon { cursor: not-allowed; opacity: .5; }
 .menu-link.is-soon:hover { background: none; color: var(--muted); }
 .menu-link em { margin-left: auto; font-family: var(--mono); font-size: 9px; font-style: normal; text-transform: uppercase; }
+.submenu-toggle { width: 100%; border-top: 0; border-right: 0; border-bottom: 0; background: none; cursor: pointer; font: inherit; font-size: 14px; color: var(--text); text-align: left; }
+.submenu-chevron { margin-left: auto; color: var(--faint); font-size: 11px; }
+.submenu .menu-link { padding-left: 40px; }
 
 .sidebar-status { display: flex; flex-direction: column; gap: 10px; padding: 20px; border-top: 1px solid var(--line); }
 .status-dot { color: var(--accent); font-family: var(--mono); font-size: 10px; letter-spacing: .12em; }
@@ -112,6 +115,18 @@ small { color: var(--faint); font-size: 11px; }
 .section-heading > span { color: var(--accent); font-family: var(--mono); font-size: 12px; }
 .module-grid, .gadget-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
 .module-card, .gadget-card { padding: 22px; border: 1px solid var(--line); background: var(--surface); }
+.tabs { display: flex; gap: 0; overflow-x: auto; border-bottom: 1px solid var(--line); }
+.tab { display: flex; flex-direction: column; gap: 4px; min-width: 160px; padding: 14px 20px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.tab:hover { color: var(--text); background: var(--surface); }
+.tab[aria-selected='true'] { color: var(--accent); border-bottom-color: var(--accent); background: var(--surface); }
+.tab-panel { padding-top: 24px; }
+.phase-step { margin-top: 32px; }
+.tab-detail { margin: 0 0 8px; color: var(--muted); }
+.code-card { margin-top: 16px; border: 1px solid var(--line); background: var(--surface); }
+.code-card header { padding: 18px 22px; border-bottom: 1px solid var(--line); }
+.code-card h3 { margin: 0 0 4px; font-family: var(--mono); font-size: 14px; }
+.code-card header p { margin: 0; color: var(--muted); font-size: 14px; }
+.code-card pre { margin: 0; padding: 18px 22px; overflow-x: auto; background: var(--surface-2); font-family: var(--mono); font-size: 13px; line-height: 1.6; }
 .module-card { display: block; min-height: 160px; transition: border-color .15s; }
 .module-card h3 { margin-top: 28px; }
 .module-card p, .gadget-card p { margin-bottom: 0; font-size: 13px; }

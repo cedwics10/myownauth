@@ -4,8 +4,15 @@ import { useRoute } from 'vue-router'
 
 import { menu } from './menu'
 
+const visibleMenu = menu.filter((section) => !section.hidden)
+
 const route = useRoute()
 const menuOpen = ref(false)
+const openSubmenus = ref(new Set(menu.filter((section) => section.submenu).map((section) => section.title)))
+
+function toggleSubmenu(title: string) {
+  if (!openSubmenus.value.delete(title)) openSubmenus.value.add(title)
+}
 
 watch(() => route.fullPath, () => (menuOpen.value = false))
 </script>
@@ -30,9 +37,19 @@ watch(() => route.fullPath, () => (menuOpen.value = false))
       </div>
 
       <nav id="main-menu" class="menu" aria-label="Navigation principale">
-        <div v-for="section in menu" :key="section.title" class="menu-section">
-          <p class="menu-title">{{ section.title }}</p>
-          <ul>
+        <div v-for="section in visibleMenu" :key="section.title" class="menu-section">
+          <button
+            v-if="section.submenu"
+            class="menu-link submenu-toggle"
+            type="button"
+            :aria-expanded="openSubmenus.has(section.title)"
+            @click="toggleSubmenu(section.title)"
+          >
+            {{ section.title }}
+            <span class="submenu-chevron" aria-hidden="true">{{ openSubmenus.has(section.title) ? '▾' : '▸' }}</span>
+          </button>
+          <p v-else class="menu-title">{{ section.title }}</p>
+          <ul v-show="!section.submenu || openSubmenus.has(section.title)" :class="{ submenu: section.submenu }">
             <li v-for="item in section.items" :key="item.path">
               <RouterLink v-if="item.component" class="menu-link" :to="item.path">
                 <span class="menu-code">{{ item.code }}</span>{{ item.label }}

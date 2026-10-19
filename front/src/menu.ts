@@ -24,6 +24,10 @@ export type MenuItem = {
 export type MenuSection = {
   title: string
   items: MenuItem[]
+  /** Section masquée de la barre latérale (les routes restent accessibles). */
+  hidden?: boolean
+  /** Affiche la section comme une entrée dépliable avec ses pages en sous-menu. */
+  submenu?: boolean
 }
 
 export const menu: MenuSection[] = [
@@ -32,7 +36,31 @@ export const menu: MenuSection[] = [
     items: [{ path: '/', label: 'Accueil', code: '00', component: () => import('./views/Home.vue') }],
   },
   {
+    title: 'TP',
+    submenu: true,
+    items: [
+      {
+        path: '/tp1',
+        label: 'TP1',
+        code: 'T1',
+        hint: 'Basic Auth : initialisation.',
+        component: () => import('./views/Tp1.vue'),
+      },
+      { path: '/tp2', label: 'TP2', code: 'T2' },
+      { path: '/tp3', label: 'TP3', code: 'T3' },
+      { path: '/tp4', label: 'TP4', code: 'T4' },
+      {
+        path: '/arsenal',
+        label: 'Arsenal',
+        code: 'AR',
+        hint: 'Gadgets disponibles.',
+        component: () => import('./views/Arsenal.vue'),
+      },
+    ],
+  },
+  {
     title: 'Bat-Computer',
+    hidden: true,
     items: [
       {
         path: '/bat-computer',
@@ -40,13 +68,6 @@ export const menu: MenuSection[] = [
         code: 'BC',
         hint: 'État du système et modules.',
         component: () => import('./views/BatComputer.vue'),
-      },
-      {
-        path: '/arsenal',
-        label: 'Arsenal',
-        code: 'AR',
-        hint: 'Gadgets disponibles.',
-        component: () => import('./views/Arsenal.vue'),
       },
       {
         path: '/reports',
